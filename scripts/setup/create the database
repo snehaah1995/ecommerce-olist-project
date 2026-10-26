@@ -5,16 +5,22 @@
   Date     : 2026-10-26
   Purpose  : Create Dev database for Olist project
 ==========================================================*/
-USE master;
+USE master
 GO
 
-IF DB_ID('Olist_Dev') IS NULL
+--CREATING DATABASE
+IF DB_ID('olist_dataset')IS NULL
 BEGIN
-    CREATE DATABASE Olist_Dev;
-    PRINT 'Database Olist_Dev created.';
+	CREATE DATABASE olist_dataset
+	PRINT ' Database created';
 END
 ELSE
 BEGIN
-    PRINT 'Olist_Dev already exists - skipped.';
+	PRINT 'olist_dataset Already data exists--skip';
 END
-GO
+
+==========================================================
+OUTPUT
+name	database_id	create_date
+olist_dataset	9	2026-10-26 14:35:54.767
+==========================================================
