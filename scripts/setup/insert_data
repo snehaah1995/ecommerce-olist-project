@@ -1,0 +1,84 @@
+/*==========================================================
+  Ticket   : DB-106
+  Author   : Sneha
+  Date     : 2026-10-26
+  Purpose  : Load raw Olist CSV files into bronze tables
+  Usage    : EXEC bronze.load_bronze @folder = 'C:\data\olist\';
+==========================================================*/
+
+CREATE OR ALTER PROCEDURE bronze.load_bronze
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SET XACT_ABORT ON;
+
+	--DECALRE VARIABLES
+	DECLARE  @start_time DATETIME,
+			@end_time DATETIME,
+			@rowcount INT;
+
+	BEGIN TRY
+		
+		SET @start_time = GETDATE();
+
+		BEGIN TRANSACTION;
+			 TRUNCATE TABLE bronze.order_data;
+			BULK INSERT bronze.order_data
+			FROM 'C:\Users\LENOVO\OneDrive\Desktop\olist_data1\olist_orders_dataset.CSV'            
+			WITH (
+                FORMAT      = 'CSV',
+                FIRSTROW    = 2,
+                FIELDQUOTE  = '"',
+                TABLOCK
+            );
+
+        SELECT @rowcount = COUNT(*) FROM bronze.order_data;
+        SET @end_time = GETDATE();
+
+		 PRINT '>> Rows Loaded  : ' + CAST(@rowcount AS NVARCHAR(20));
+        PRINT '>> Load Duration: '
+              + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR(20)) + ' seconds'
+		
+		SET @start_time = GETDATE();
+
+			TRUNCATE TABLE bronze.order_reviews_data;
+			BULK INSERT bronze.order_reviews_data
+			FROM 'C:\Users\LENOVO\OneDrive\Desktop\olist_data1\olist_order_reviews_dataset.CSV'            
+			WITH (
+                FORMAT      = 'CSV',
+                FIRSTROW    = 2,
+                FIELDQUOTE  = '"',
+                TABLOCK
+            );
+			COMMIT TRANSACTION;   -- only reached if the load succeeded
+
+        SELECT @rowcount = COUNT(*) FROM bronze.order_reviews_data;
+        SET @end_time = GETDATE();
+
+		 PRINT '>> Rows Loaded  : ' + CAST(@rowcount AS NVARCHAR(20));
+        PRINT '>> Load Duration: '
+              + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR(20)) + ' seconds';
+	END TRY
+	BEGIN CATCH
+        -- Undo the truncate so the old rows come back.
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        PRINT 'Error Message: ' + ERROR_MESSAGE();
+
+        -- PRINT is for people. THROW makes the failure visible to a scheduler,
+        -- so a failed load never looks like a successful one. Must be the last line.
+        THROW;
+    END CATCH
+END
+
+EXEC bronze.load_bronze
+========================================================================================
+OUTPUT
+>> Rows Loaded  : 99441
+>> Load Duration: 0 seconds
+>> Rows Loaded  : 99223
+>> Load Duration: 0 seconds
+
+Completion time: 2026-10-26T23:55:21.8232443+05:30
+
