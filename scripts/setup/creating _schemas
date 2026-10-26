@@ -1,0 +1,52 @@
+--creating schemas 
+/*==========================================================
+  Ticket   : DB-102
+  Author   : Sneha
+  Date     : 2026-10-26
+  Purpose  : Create dbo.orders table in Olist_Dev
+==========================================================*/
+USE olist_dataset;
+GO
+
+--creating schema 
+
+IF NOT EXISTS(SELECT * FROM sys.schemas WHERE name = 'bronze')
+BEGIN
+	EXEC('CREATE SCHEMA bronze');
+	PRINT 'Created bronze schema';
+END
+ELSE
+BEGIN
+	PRINT 'Schema bronze already exists - skipped.';
+END
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.schemas WHERE name = 'silver')
+BEGIN
+	EXEC('CREATE SCHEMA silver');
+	PRINT 'Created silver schema';
+END
+ELSE
+BEGIN
+	PRINT 'Schema silver already exists - skipped.';
+END
+GO
+
+
+IF NOT EXISTS(SELECT * FROM sys.schemas WHERE name = 'gold')
+BEGIN
+	EXEC('CREATE SCHEMA gold');
+	PRINT 'Created gold schema'
+END
+ELSE
+BEGIN
+	    PRINT 'Schema gold already exists - skipped.';
+END
+GO
+
+--verify
+SELECT name FROM sys.schemas WHERE name IN ('bronze','silver','gold');
+GO
+
+
+              
