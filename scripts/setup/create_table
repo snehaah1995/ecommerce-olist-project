@@ -44,4 +44,42 @@ order_delivered_carrier_date	varchar	30
 order_delivered_customer_date	varchar	30
 order_estimated_delivery_date	varchar	30
 
+==========================================================
 
+
+--Create table bronze.order_reviews_data
+IF OBJECT_ID('bronze.order_reviews_data', 'U') IS NOT NULL
+	DROP TABLE bronze.order_reviews_data;
+GO
+
+CREATE TABLE bronze.order_reviews_data(
+	review_id	VARCHAR(50),
+	order_id	VARCHAR(50),
+	review_score VARCHAR(30),	
+	review_comment_title	VARCHAR(225),
+	review_comment_message	VARCHAR(225),
+	review_creation_date	VARCHAR(30),
+	review_answer_timestamp	VARCHAR(30)	
+)
+
+SELECT 
+	COLUMN_NAME,
+	DATA_TYPE,
+	CHARACTER_MAXIMUM_LENGTH
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'bronze'
+	AND TABLE_NAME = 'order_reviews_data'
+ORDER BY ORDINAL_POSITION;
+
+==========================================================
+OUTPUT
+COLUMN_NAME	DATA_TYPE	CHARACTER_MAXIMUM_LENGTH
+review_id	varchar	50
+order_id	varchar	50
+review_score	varchar	30
+review_comment_title	varchar	225
+review_comment_message	varchar	225
+review_creation_date	varchar	30
+review_answer_timestamp	varchar	30
+
+==========================================================
