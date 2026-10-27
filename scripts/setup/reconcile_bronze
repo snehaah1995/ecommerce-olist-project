@@ -1,0 +1,36 @@
+##Problem:
+After loading olist_order_reviews_dataset.csv into bronze.order_reviews_data, the table had 99,223 rows. 
+The source file has 99,224 rows (counted in Excel, excluding header). One row was missing, with no error message.
+=======================================================================================================================
+
+=======================================================================================================================
+##Root cause (probable):
+The CSV is UTF-8 and contains Portuguese characters. 
+The load did not specify the code page, and the comment columns were VARCHAR. Text was misread (e.g. “não” appeared as “n+úo”) and one row was lost.
+=======================================================================================================================
+
+=======================================================================================================================
+##Fix:
+BULK INSERT now uses CODEPAGE = '65001' (UTF-8).
+review_comment_title and review_comment_message changed to NVARCHAR.
+Reloaded with bronze.load_bronze.
+=======================================================================================================================
+
+##Verification:
+Row count now 99,224, which matches the source. Accents display correctly.
+
+##How to prevent it:
+After every file load, compare the row count with the source file before moving on.
+=======================================================================================================================
+
+=======================================================================================================================
+WITH (
+    FORMAT     = 'CSV',
+    FIRSTROW   = 2,
+    FIELDQUOTE = '"',
+    CODEPAGE   = '65001',
+    TABLOCK
+);
+
+ALTER TABLE bronze.order_reviews_data ALTER COLUMN review_comment_title   NVARCHAR(200);
+ALTER TABLE bronze.order_reviews_data ALTER COLUMN review_comment_message NVARCHAR(MAX);
